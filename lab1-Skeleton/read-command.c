@@ -10,10 +10,40 @@
 
 #include <stdio.h>
 
-#define '(' : 0
-#define '&&':  //TODO: Forgot syntax
-#define '||': 1
-#define ';'
+int numberOfOper(cstring * operator)
+{
+	switch(operator)
+	{
+		case '(': return 0;
+		case ')': return 1;
+		case ';': return 2;
+		case '|': return 3;
+		case '&&': return 4;
+		case '||': return 5;
+		case '<': return 6;
+		default: return 7; //Aka '>'
+	}
+	return -1; //Returns -1 if not an operator, then it's a command!
+}
+
+int precedence(int num) //TODO: Need to make all precedence cases
+{
+	switch(num)
+	{
+		case 0:
+		case 1:
+		 return 0;
+		case 2:
+		case 3:
+			return 1;
+		case 4:
+		case 5:
+			return 2;
+		default:
+			return 3; //aka '<' or '>'
+	}
+	return -1;
+}
 
 //*** Stack for commands or operators ***//
 
@@ -75,7 +105,9 @@ bool makeElement(char curr, cstring* currElement)
 
 void process(cstring *currElement, struct stack_node *operatorStack, struct stack_node *commandStack)
 {
-	if(isCommand(*currElement))
+	int opNum = numberOfOper(*currElement);
+
+	if(opNum == -1)
 	{
 		push(*commandStack, NULL, *currElement);
 	}
@@ -87,13 +119,13 @@ void process(cstring *currElement, struct stack_node *operatorStack, struct stac
 		}
 		else
 		{
-			if(precedence(*currElement) > precedence(peekOperator(*operatorStack))) //TODO: Write precedence, if necessary
+			if(precedence(opNum)) > precedence(peekOperator(*operatorStack)))
 			{
 				push(*operatorStack, *currElement, NULL);
 			}
 			else
 			{
-				while(peekOperator(*operatorStack) != 0 && precedence(*currElement) <= precedence(peekOperator(*operatorStack))) //TODO: #define '(' as 0
+				while(peekOperator(*operatorStack) != 0 && precedence(opNum) <= precedence(peekOperator(*operatorStack))) //TODO: #define '(' as 0
 				{
 					int tempOper = peekOperator(*operatorStack);
 					pop(*operatorStack);
@@ -143,7 +175,7 @@ make_command_stream (int (*get_next_byte) (void *),
 	{
 		if(!isNewElement(curr, *currElement))
 		{
-			process(*currElement, *operatorStack, *commandStack); //TODO: How do you know the stream is done? 
+			process(*currElement, *operatorStack, *commandStack); //TODO: How do you know the stream is done?
 			*currElement = NULL;
 			makeElement(curr, *currElement);
 		}
