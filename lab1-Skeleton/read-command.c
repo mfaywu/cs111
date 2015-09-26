@@ -8,8 +8,13 @@
 /* FIXME: You may need to add #include directives, macro definitions,
    static function definitions, etc.  */
 
+#define '&&': 0 //TODO: Forgot syntax
+
+//Stack for commands or operators
+
 struct stack_node
 {
+	int operator;
 	command_t command;
 	struct stack_node *next;
 }
@@ -19,33 +24,39 @@ void init(struct stack_node* head)
     head = NULL;
 }
 
-struct stack_node* push(struct stack_node* head, command_t command)
+struct stack_node* push(struct stack_node* head, int operator, command_t command)
 {
     struct stack_node* temp = (struct stack_node*)malloc(sizeof(struct stack_node));
     if(temp == NULL)
     {
         exit(0);
     }
+		temp->operator = operator;
     temp->command = command;
     temp->next = head;
     head = temp;
     return head;
 }
 
-struct stack_node* pop(struct stack_node *head, command_t *command)
+struct stack_node* pop(struct stack_node *head, int *operator, command_t *command)
 {
     struct stack_node* temp = head;
+		*operator = head->operator;
     *command = head->command;
     head = head->next;
     free(temp);
     return head;
 }
 
-command_t peek(struct stack_node* head)
+command_t peekCommand(struct stack_node* head)
 {
 	return head->command;
 }
 
+int peekOperator(struct stack_node* head)
+{
+	return head->operator;
+}
 
 /* FIXME: Define the type 'struct command_stream' here.  This should
    complete the incomplete type declaration in command.h.  */
