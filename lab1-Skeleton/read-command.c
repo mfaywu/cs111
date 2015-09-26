@@ -8,9 +8,11 @@
 /* FIXME: You may need to add #include directives, macro definitions,
    static function definitions, etc.  */
 
+#include <stdio.h>
+
 #define '&&': 0 //TODO: Forgot syntax
 
-//Stack for commands or operators
+//*** Stack for commands or operators ***//
 
 struct stack_node
 {
@@ -58,6 +60,18 @@ int peekOperator(struct stack_node* head)
 	return head->operator;
 }
 
+//TODO: Returns true if curr is separate from the currCommand
+//false if curr should be concatenated to currCommand
+bool isNewCommand(char curr, command* currCommand)
+{
+
+}
+
+bool makeCommand(char curr, command* currCommand)
+{
+
+}
+
 /* FIXME: Define the type 'struct command_stream' here.  This should
    complete the incomplete type declaration in command.h.  */
 
@@ -78,10 +92,20 @@ make_command_stream (int (*get_next_byte) (void *),
   //return 0;
 
 	char curr;
+	command currCommand = NULL;
 
 	while((curr = get_next_byte(get_next_byte_argument)) != EOF)
 	{
-
+		if(isNewCommand(curr, *currCommand))
+		{
+			//process mkcommand
+			*currCommand = NULL;
+			makeCommand(curr, *currCommand);
+		}
+		else
+		{
+			makeCommand(curr, *currCommand);
+		}
 	}
 
 	//return some command_stream;
