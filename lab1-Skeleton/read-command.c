@@ -62,12 +62,12 @@ int peekOperator(struct stack_node* head)
 
 //TODO: Returns true if curr is separate from the currCommand
 //false if curr should be concatenated to currCommand
-bool isNewCommand(char curr, command* currCommand)
+bool isNewElement(char curr, cstring* currElement)
 {
 
 }
 
-bool makeCommand(char curr, command* currCommand)
+bool makeElement(char curr, cstring* currElement)
 {
 
 }
@@ -92,23 +92,23 @@ make_command_stream (int (*get_next_byte) (void *),
   //return 0;
 
 	char curr;
-	command currCommand = NULL;
+	cstring currElement = NULL;
 
 	while((curr = get_next_byte(get_next_byte_argument)) != EOF)
 	{
-		if(isNewCommand(curr, *currCommand))
+		if(isNewElement(curr, *currElement))
 		{
-			//process mkcommand
-			*currCommand = NULL;
-			makeCommand(curr, *currCommand);
+			process(*currElement;
+			*currElement = NULL;
+			makeElement(curr, *currElement);
 		}
 		else
 		{
-			makeCommand(curr, *currCommand);
+			makeElement(curr, *currElement);
 		}
 	}
 
-	//return some command_stream;
+	//return some pointer to a linkedlist of commands aka command_stream;
 }
 
 command_t
