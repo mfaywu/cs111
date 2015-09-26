@@ -26,7 +26,7 @@ int numberOfOper(cstring * operator)
 	return -1; //Returns -1 if not an operator, then it's a command!
 }
 
-int precedence(int num) //TODO: Need to make all precedence cases
+int precedence(int num) //TODO: Need to make sure these precedence cases are correct
 {
 	switch(num)
 	{
@@ -45,6 +45,7 @@ int precedence(int num) //TODO: Need to make all precedence cases
 	return -1;
 }
 
+//***************************************//
 //*** Stack for commands or operators ***//
 
 struct stack_node
@@ -91,14 +92,22 @@ int peekOperator(struct stack_node* head)
 	return head->operator;
 }
 
+//***************************************//
+
 //TODO: Returns true if curr is separate from the currCommand
 //false if curr should be concatenated to currCommand
-bool isNewElement(char curr, cstring* currElement)
+//isNewCommand returns true if this is the end of the complete command
+bool isNewElement(char curr, cstring* currElement, bool *isNewCommand)
 {
 
 }
 
 bool makeElement(char curr, cstring* currElement)
+{
+
+}
+
+command combine (command firstCommand, command secondCommand, int temOper) //TODO
 {
 
 }
@@ -125,7 +134,7 @@ void process(cstring *currElement, struct stack_node *operatorStack, struct stac
 			}
 			else
 			{
-				while(peekOperator(*operatorStack) != 0 && precedence(opNum) <= precedence(peekOperator(*operatorStack))) //TODO: #define '(' as 0
+				while(numberOfOper(peekOperator(*operatorStack)) != 0 && precedence(opNum) <= precedence(peekOperator(*operatorStack))) //TODO: #define '(' as 0
 				{
 					int tempOper = peekOperator(*operatorStack);
 					pop(*operatorStack);
@@ -167,17 +176,23 @@ make_command_stream (int (*get_next_byte) (void *),
 
 	char curr;
 	cstring currElement = NULL;
+	bool *isNewCommand;
+	//have a pointer to the first complete command, which we'll call stream
 
 	struct stack_node* operatorStack;
 	struct stack_node* commandStack;
 
 	while((curr = get_next_byte(get_next_byte_argument)) != EOF)
 	{
-		if(!isNewElement(curr, *currElement))
+		if(isNewElement(curr, *currElement, *isNewCommand))
 		{
 			process(*currElement, *operatorStack, *commandStack); //TODO: How do you know the stream is done?
 			*currElement = NULL;
 			makeElement(curr, *currElement);
+			if(*isNewCommand)
+			{
+				//that means this complete command is over, so store this into the command_stream as a new node
+			}
 		}
 		else
 		{
@@ -185,7 +200,7 @@ make_command_stream (int (*get_next_byte) (void *),
 		}
 	}
 
-	//return some pointer to a linkedlist of commands aka command_stream;
+	//return stream, which is some pointer to a linkedlist of commands aka command_stream;
 }
 
 command_t
