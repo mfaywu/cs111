@@ -10,7 +10,10 @@
 
 #include <stdio.h>
 
-#define '&&': 0 //TODO: Forgot syntax
+#define '(' : 0
+#define '&&':  //TODO: Forgot syntax
+#define '||': 1
+#define ';'
 
 //*** Stack for commands or operators ***//
 
@@ -40,11 +43,9 @@ struct stack_node* push(struct stack_node* head, int operator, command_t command
     return head;
 }
 
-struct stack_node* pop(struct stack_node *head, int *operator, command_t *command)
+struct stack_node* pop(struct stack_node *head)
 {
     struct stack_node* temp = head;
-		*operator = head->operator;
-    *command = head->command;
     head = head->next;
     free(temp);
     return head;
@@ -72,6 +73,47 @@ bool makeElement(char curr, cstring* currElement)
 
 }
 
+void process(cstring *currElement, struct stack_node *operatorStack, struct stack_node *commandStack)
+{
+	if(isCommand(*currElement))
+	{
+		push(*commandStack, NULL, *currElement);
+	}
+	else
+	{
+		if(*operatorstack == NULL)
+		{
+			push(*operatorStack, *currElement, NULL);
+		}
+		else
+		{
+			if(precedence(*currElement) > precedence(peekOperator(*operatorStack))) //TODO: Write precedence, if necessary
+			{
+				push(*operatorStack, *currElement, NULL);
+			}
+			else
+			{
+				while(peekOperator(*operatorStack) != 0 && precedence(*currElement) <= precedence(peekOperator(*operatorStack))) //TODO: #define '(' as 0
+				{
+					int tempOper = peekOperator(*operatorStack);
+					pop(*operatorStack);
+					int secondCommand = peekCommand(*commandStack);
+					pop(*commandStack);
+					int firstCommand = peekCommand(*commandStack);
+					pop(*commandStack);
+					command newCommand = combine(firstCommand, secondCommand, tempOper); //TODO: Write combine
+					push(*commandStack, NULL, newCommand);
+					if(*operatorStack == NULL)
+					{
+						break;
+					}
+				}
+			}
+			push(*operatorStack, *currElement, NULL);
+		}
+	}
+}
+
 /* FIXME: Define the type 'struct command_stream' here.  This should
    complete the incomplete type declaration in command.h.  */
 
@@ -94,11 +136,14 @@ make_command_stream (int (*get_next_byte) (void *),
 	char curr;
 	cstring currElement = NULL;
 
+	struct stack_node* operatorStack;
+	struct stack_node* commandStack;
+
 	while((curr = get_next_byte(get_next_byte_argument)) != EOF)
 	{
-		if(isNewElement(curr, *currElement))
+		if(!isNewElement(curr, *currElement))
 		{
-			process(*currElement;
+			process(*currElement, *operatorStack, *commandStack); //TODO: How do you know the stream is done? 
 			*currElement = NULL;
 			makeElement(curr, *currElement);
 		}
