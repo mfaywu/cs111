@@ -1,0 +1,16 @@
+COM SCI 111
+Lab 1A
+Section 1C
+
+Partners:
+Mengfei Wu // UID: 104152503
+Jake Romanas // UID: 604128624
+
+Known Limitations:
+- Our code does not handle sequence commands as that was not in test-p-ok.sh or test-p-bad.sh
+
+Extra features:
+- Our code implements two stacks using Linked Lists - one for commands and one for operators. 
+- The algorithm for the stacks used was the suggested algorithm from class.
+- We first read in the whole file into a dynamically allocated buffer.
+- command_stream is a struct that contains a pointer to a command and a pointer to the next command_stream
