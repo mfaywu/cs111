@@ -395,6 +395,13 @@ command_stream_t make_command_stream(int(*get_next_byte) (void *),
 		else
 			if (buffer[i] == '<')
 			{
+				int k = i;
+				while (buffer[k-1] == ' ')
+				{
+					k--;
+					if(buffer[k-1] == '\n')
+						error(1, 0, "Line %d: Operator and word on diff lines", __LINE__);
+				}
 				if (wordElement[0][0] == '\0')
 					error(1, 0, "Line %d: No command given to '<'", __LINE__);
 				i++;
@@ -492,6 +499,15 @@ command_stream_t make_command_stream(int(*get_next_byte) (void *),
 			else
 				if (buffer[i] == '>')
 				{
+					int k = i;
+					while (buffer[k-1] == ' ')
+					{
+						k--;
+						if(buffer[k-1] == '\n')
+							error(1, 0, "Line %d: Operator and word on diff lines", __LINE__);
+					}
+					if (wordElement[0][0] == '\0')
+					error(1, 0, "Line %d: No command given to '<'", __LINE__);
 					i++;
 					while (buffer[i] != '<' && buffer[i] != '>' && buffer[i] != '&' && buffer[i] != '|' && buffer[i] != '(' && buffer[i] != ')' && buffer[i] != ';' && buffer[i] != '\n')
 					{
@@ -634,6 +650,13 @@ command_stream_t make_command_stream(int(*get_next_byte) (void *),
 					else
 						if (buffer[i] == '&')
 						{
+							int k = i;
+							while (buffer[k-1] == ' ')
+							{
+								k--;
+								if(buffer[k-1] == '\n')
+									error(1, 0, "Line %d: Operator and word on diff lines", __LINE__);
+							}
 							//if (buffer[i] == '&' && operatorStack == NULL)
 							//	error(1, 0, "Line %d: Missing pipe for '&&'", __LINE__);
 							if (wordElement[0][0] == '\0')
