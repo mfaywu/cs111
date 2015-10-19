@@ -30,8 +30,8 @@ int numberOfOper(char *operator)
 {
 	switch (operator[0])
 	{
-	case '(': return 0;
-	case ')': return 1;
+	case ')': return 0;
+	case '(': return 1;
 	case ';': return 2;
 	case '|':
 		if (operator[1] == '|')
@@ -190,6 +190,14 @@ bool makeSimpleCommand(char** wordElement, char* inputElement, char* outputEleme
 	return true;
 }
 
+command_t makeSubshell(command_t topCommand)
+{
+	command_t newCommand = (command_t)checked_malloc(sizeof(struct command));
+	newCommand->u.subshell_command = topCommand;
+	newCommand->type = SUBSHELL_COMMAND;
+	return newCommand;
+}
+
 command_t combine(command_t firstCommand, command_t secondCommand, int tempOper) //TODO: Doesn't handle subshell
 {
 	command_t newCommand = (command_t)checked_malloc(sizeof(struct command));
@@ -233,14 +241,24 @@ void processOperator(int operator)
 		{
 			while (precedence(peekOperator()) != 0 && precedence(operator) <= precedence(peekOperator()))
 			{
-				int tempOper = peekOperator();
-				pop(true);
-				command_t secondCommand = peekCommand();
-				pop(false);
-				command_t firstCommand = peekCommand();
-				pop(false);
-				command_t newCommand = combine(firstCommand, secondCommand, tempOper);
-				push(-1, newCommand);
+				int topOper = peekOperator();
+				if(topOper == 1) 
+				{
+					command_t topCommand = peekCommand();
+					pop(false);
+					command_t newCommand = makeSubshell(topCommand);
+				}
+				if(topOper != 1)
+				{
+					int tempOper = peekOperator();
+					pop(true);
+					command_t secondCommand = peekCommand();
+					pop(false);
+					command_t firstCommand = peekCommand();
+					pop(false);
+					command_t newCommand = combine(firstCommand, secondCommand, tempOper);
+					push(-1, newCommand);
+				}
 				if (operatorStack == NULL)
 					break;
 			}
@@ -364,6 +382,12 @@ command_stream_t make_command_stream(int(*get_next_byte) (void *),
 		{
 			if(openCount == 0)
 				error(1, 0, "Line %d: Expected '(' before ')'", __LINE__);
+		}
+
+		if(buffer[i] = '(') 
+		{
+			op = numberOfOper(&buffer[i]);
+			processOperator(op);
 		}
 
 		//Case of ' '
