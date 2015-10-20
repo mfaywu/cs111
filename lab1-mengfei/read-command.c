@@ -874,8 +874,19 @@ command_stream_t make_command_stream(int(*get_next_byte) (void *),
 												break;
 										}
 										//if (buffer[i] != ' ')
-											wordElement[currWord][usedWord] = buffer[i];
+										wordElement[currWord][usedWord] = buffer[i];
 										usedWord++;
+										if (i + 1 == filled)
+										{
+											currWord++;
+											wordElement[currWord] = '\0';
+											if (usedInput == 0)
+												inputElement = NULL;
+											if (usedOutput == 0)
+												outputElement = NULL;
+											makeSimpleCommand(wordElement, inputElement, outputElement);
+											completeCommand();
+										}
 									}
 		i++;
 	}
