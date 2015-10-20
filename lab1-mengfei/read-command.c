@@ -431,13 +431,18 @@ command_stream_t make_command_stream(int(*get_next_byte) (void *),
 				i++;
 				while (buffer[i] != '<' && buffer[i] != '>' && buffer[i] != '&' && buffer[i] != '|' && buffer[i] != '(' && buffer[i] != ')' && buffer[i] != ';' && buffer[i] != '\n')
 				{
-					if (buffer[i] == 39)
+					if (i == filled)
 					{
 						if (DEBUG) printf("378 Complete command, free buffer bc EOF\n");
-						//if (commandStack == NULL)
-						//	error(1, 0, "Line %d: Nothing in commandStack", __LINE__);
+						currWord++;
+						wordElement[currWord] = '\0';
+						if (usedInput == 0)
+							inputElement = NULL;
+						if (usedOutput == 0)
+							outputElement = NULL;
+						makeSimpleCommand(wordElement, inputElement, outputElement);
 						completeCommand();
-						free(buffer);
+						//free(buffer);
 						return headStream;
 					}
 					if (buffer[i] == ' ')
@@ -468,11 +473,18 @@ command_stream_t make_command_stream(int(*get_next_byte) (void *),
 					i++;
 					while (buffer[i] != '<' && buffer[i] != '>' && buffer[i] != '&' && buffer[i] != '|' && buffer[i] != '(' && buffer[i] != ')' && buffer[i] != ';' && buffer[i] != '\n')
 					{
-						if (buffer[i] == 39)
+						if (i == filled)
 						{
 							if (DEBUG) printf("413 Complete command, free buffer at EOF\n");
+							currWord++;
+							wordElement[currWord] = '\0';
+							if (usedInput == 0)
+								inputElement = NULL;
+							if (usedOutput == 0)
+								outputElement = NULL;
+							makeSimpleCommand(wordElement, inputElement, outputElement);
 							completeCommand();
-							free(buffer);
+							//free(buffer);
 							return headStream;
 						}
 						if (buffer[i] == ' ')
@@ -500,22 +512,6 @@ command_stream_t make_command_stream(int(*get_next_byte) (void *),
 					usedOutput++;
 					//i--; //Check logic
 				}
-				/*wordElement[currWord + 1] = "\0";
-				if (usedInput == 0)
-				inputElement = NULL;
-				if (usedOutput == 0)
-				outputElement = NULL;
-				if(DEBUG) printf("makeSimpleCommand %s\n", wordElement[0]);
-				makeSimpleCommand(wordElement, inputElement, outputElement);
-				bufferWordSize = 10;
-				currWord = 0;
-				usedWord = 0;
-				usedInput = 0;
-				usedOutput = 0;
-				wordElement = (char**)checked_malloc(sizeof(char*));
-				wordElement[currWord] = (char*)checked_malloc(bufferWordSize);
-				inputElement = (char*)checked_malloc(bufferInputSize);
-				outputElement = (char*)checked_malloc(bufferOutputSize);*/
 				i--;
 			}
 		/////CHECK FOR EXTRA i++!!!!!
@@ -535,11 +531,18 @@ command_stream_t make_command_stream(int(*get_next_byte) (void *),
 					i++;
 					while (buffer[i] != '<' && buffer[i] != '>' && buffer[i] != '&' && buffer[i] != '|' && buffer[i] != '(' && buffer[i] != ')' && buffer[i] != ';' && buffer[i] != '\n')
 					{
-						if (buffer[i] == 39)
+						if (i == filled)
 						{
 							if (DEBUG) printf("471 Complete Command, free buffer at EOF");
+							currWord++;
+							wordElement[currWord] = '\0';
+							if (usedInput == 0)
+								inputElement = NULL;
+							if (usedOutput == 0)
+								outputElement = NULL;
+							makeSimpleCommand(wordElement, inputElement, outputElement);
 							completeCommand();
-							free(buffer);
+							//free(buffer);
 							return headStream;
 						}
 						if (buffer[i] == ' ')
@@ -570,12 +573,18 @@ command_stream_t make_command_stream(int(*get_next_byte) (void *),
 						i++;
 						while (buffer[i] != '<' && buffer[i] != '>' && buffer[i] != '&' && buffer[i] != '|' && buffer[i] != '(' && buffer[i] != ')' && buffer[i] != ';' && buffer[i] != '\n')
 						{
-							if (buffer[i] == 39)
+							if (i == filled)
 							{
 								if (DEBUG) printf("505 Complete Command, free buffer at EOF");
-
+								currWord++;
+								wordElement[currWord] = '\0';
+								if (usedInput == 0)
+									inputElement = NULL;
+								if (usedOutput == 0)
+									outputElement = NULL;
+								makeSimpleCommand(wordElement, inputElement, outputElement);
 								completeCommand();
-								free(buffer);
+								//free(buffer);
 								return headStream;
 							}
 							if (buffer[i] == ' ')
@@ -869,64 +878,6 @@ command_stream_t make_command_stream(int(*get_next_byte) (void *),
 										usedWord++;
 									}
 		i++;
-		/*//To add the next char to wordElement, part of same word
-		if(usedWord >= bufferWordSize)
-		increaseSize(wordElement[currWord], usedWord, &bufferWordSize);
-		wordElement[currWord][usedWord] = buffer[i];
-		usedWord++;
-		//To end the current word (cuz you encountered a space)
-		if(usedWord >= bufferWordSize)
-		increaseSize(wordElement[currWord], usedWord, &bufferWordSize);
-		wordElement[currWord][usedWord] = '\0';
-		usedWord++;
-		//To add the next char to wordElement, new word (after you ended the previous word)
-		usedWord = 0;
-		bufferWordSize = 10;
-		currWord++;
-		wordElement[currWord] = (char*)checked_malloc(bufferWordSize);
-		wordElement[currWord][usedWord] = buffer[i];
-		usedWord++;
-		//To add the next char to Input
-		if(usedInput >= bufferInputSize)
-		increaseSize(inputElement, usedInput, &bufferInputSize);
-		inputElement[usedInput] = buffer[i];
-		usedInput++;
-		//Add the null after the input is done
-		if(usedInput >= bufferInputSize)
-		increaseSize(inputElement, usedInput, &bufferInputSize);
-		inputElement[usedInput] = '\0';
-		usedInput++;
-		//To add the next char to Output
-		if(usedOutput >= bufferOutputSize)
-		increaseSize(outputElement, usedOutput, &bufferOutputSize);
-		outputElement[usedOutput] = buffer[i];
-		usedOutput++;
-		//Add the null after the output is done
-		if(usedOutput >= bufferOutputSize)
-		increaseSize(outputElement, usedOutput, &bufferOutputSize);
-		outputElement[usedOutput] = '\0';
-		usedOutput++; *?
-		//When you want to make a command***************************/
-		//makeSimpleCommand(wordElement, inputElement, outputElement, commandStack);
-		//***When you encounter an operator****************************//
-		//processOperator(numberOfOper(&buffer[i]), operatorStack);
-		//***When you want to complete the command*********************//
-		//completeCommand(operatorStack, commandStack);
-		//***When you are done using whatever element******************//
-		/*
-		//To free up the wordElement
-		bufferWordSize = 10;
-		usedWord = 0;
-		wordElement = (char*)checked_malloc(bufferWordSize);
-		//To free up the input
-		bufferInputSize = 10;
-		usedInput = 0;
-		inputElement = (char*)checked_malloc(bufferInputSize);
-		//To free up the Output
-		bufferOutputSize = 10;
-		usedOutput = 0;
-		outputElement = (char*)checked_malloc(bufferOutputSize);
-		*/
 	}
 	free(buffer);
 	return headStream;
@@ -972,3 +923,9 @@ read_command_stream(command_stream_t s)
 // FOR SOME REASON THERE IS AN OR COMMAND LEFT ON Stream PRIOR TO NUMBER 7 ---> i ~= 168
 //  (STREAM MAYBE NOT REALLOCATED?)
 // wordElement is 1d array in 6
+
+//10/19/15
+//Fixed carrots running past (see line 405, check if i == filled)
+//Line ~699, added makeSimpleCommand
+//Commented out all free(buffer), which fixed memory errors when order of commands switched around in test script (don't know why free worked sometimes, failed others)
+//Added makeSimpleCommand before all calls to completeCommand
